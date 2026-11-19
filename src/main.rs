@@ -1,43 +1,40 @@
-use gpui::{
-    div, prelude::*, px, rgb, size, App, Application, Bounds, Context, SharedString, Window,
-    WindowBounds, WindowOptions,
-};
+use gpui_kit::component::button::{Button, ButtonVariants};
+use gpui_kit::component::label::Label;
+use gpui_kit::*;
 
-struct HelloWorld {
-    text: SharedString,
-}
+struct HelloWorld;
 
 impl Render for HelloWorld {
     fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
         div()
             .flex()
             .flex_col()
-            .gap_3()
-            .size(px(500.0))
+            .gap_4()
+            .size_full()
             .items_center()
             .justify_center()
-            .bg(rgb(0x2e7d32))
-            .text_xl()
-            .text_color(rgb(0xffffff))
-            .child(format!("Hello, {}!", &self.text))
+            .child(Label::new("Hello, World!"))
+            .child(Button::new("go").primary().label("Let's Go!"))
     }
 }
 
 fn main() {
-    Application::new().run(|cx: &mut App| {
-        let bounds = Bounds::centered(None, size(px(500.0), px(500.0)), cx);
-        cx.open_window(
+    application().run(|cx| {
+        init(cx);
+        let bounds = Bounds::centered(None, size(px(500.0), px(300.0)), cx);
+        open_window(
             WindowOptions {
+                titlebar: Some(TitlebarOptions {
+                    title: Some("Bamboo Launcher".into()),
+                    ..Default::default()
+                }),
                 window_bounds: Some(WindowBounds::Windowed(bounds)),
                 ..Default::default()
             },
-            |_, cx| {
-                cx.new(|_| HelloWorld {
-                    text: "World".into(),
-                })
-            },
+            cx,
+            |_, cx| cx.new(|_| HelloWorld),
         )
-        .unwrap();
+        .expect("failed to open window");
         cx.activate(true);
     });
 }
